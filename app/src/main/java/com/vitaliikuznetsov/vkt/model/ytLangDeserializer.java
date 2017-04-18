@@ -27,42 +27,26 @@ public class ytLangDeserializer implements JsonDeserializer<ArrayList> {
 
     @Override
     public ArrayList deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        if (json.isJsonObject()){
-            JsonObject jsonObject = json.getAsJsonObject();
-            if (jsonObject.has(SER_CONTENT_ARRAY) && jsonObject.get(SER_CONTENT_ARRAY).isJsonObject()){
-                JsonObject langs = jsonObject.getAsJsonObject(SER_CONTENT_ARRAY);
-                JSONObject jso = null;
-                try {
-                    jso = new JSONObject(langs.toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Iterator<String> iterator = jso.keys();
-                while (iterator.hasNext()){
-                    Log.d("ytLangDeserializer", iterator.next());
-                }
-            }
-        }
-        return null;
-    }
-
-//    public Lang deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException, JSONException {
 //        if (json.isJsonObject()){
 //            JsonObject jsonObject = json.getAsJsonObject();
 //            if (jsonObject.has(SER_CONTENT_ARRAY) && jsonObject.get(SER_CONTENT_ARRAY).isJsonObject()){
 //                JsonObject langs = jsonObject.getAsJsonObject(SER_CONTENT_ARRAY);
-//                JSONObject jso = null;
 //                try {
-//                    jso = new JSONObject(langs.toString());
+//                    JSONObject jso = new JSONObject(langs.toString());
+//                    Iterator<String> iterator = jso.keys();
+//                    ArrayList out = new ArrayList();
+//                    while (iterator.hasNext()){
+//                        String langCode = iterator.next();
+//                        String langTitle = jso.getString(langCode);
+//                        Lang lang = new Lang(langCode, langTitle);
+//                        out.add(lang);
+//                    }
+//                    return out;
 //                } catch (JSONException e) {
 //                    e.printStackTrace();
 //                }
-//                Iterator<String> iterator = jso.keys();
-//                while (iterator.hasNext()){
-//                    Log.d("ytLangDeserializer", iterator.next());
-//                }
 //            }
 //        }
-//        return null;
-//    }
+        return null;
+    }
 }

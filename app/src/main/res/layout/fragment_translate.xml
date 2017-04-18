@@ -1,13 +1,159 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:clickable="true"
+    android:background="#ffffff"
     tools:context="com.vitaliikuznetsov.vkt.fragment.TranslateFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <FrameLayout
+        android:id="@+id/layoutTop"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="60dp"
+        android:layout_gravity="start"
+        android:background="@color/colorPrimary">
 
-</FrameLayout>
+        <RelativeLayout
+            android:id="@+id/ll1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/textLangSource"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_toStartOf="@+id/buttonSwap"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:lines="1"
+                android:maxLines="1"
+                android:textColor="@color/colorText"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/buttonSwap"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/ic_repeat" />
+
+            <TextView
+                android:id="@+id/textLangTarget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/buttonSwap"
+                android:ellipsize="end"
+                android:gravity="start"
+                android:lines="1"
+                android:maxLines="1"
+                android:textColor="@color/colorText"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/layoutInput"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:layout_margin="14dp"
+        android:background="@drawable/shape_stroke"
+        android:paddingBottom="8dp"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp">
+
+        <EditText
+            android:id="@+id/editInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/buttonClear"
+            android:background="#00000000"
+            android:ems="10"
+            android:gravity="start"
+            android:hint="Введите текст для перевода"
+            android:inputType="textCapSentences|textMultiLine|textImeMultiLine"
+            android:minHeight="100dp"
+            android:scrollbars="vertical"
+            android:textColor="@color/colorText"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/buttonClear"
+            android:layout_width="40dp"
+            android:layout_height="70dp"
+            android:layout_alignParentEnd="true"
+            android:background="#00000000" />
+
+        <ImageView
+            android:id="@+id/imageTrash"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignEnd="@+id/buttonClear"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_trash" />
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="14dp"
+        android:layout_marginStart="14dp"
+        android:indeterminate="true" />
+
+    <RelativeLayout
+        android:id="@+id/layoutOutput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginStart="14dp"
+
+        android:paddingBottom="8dp"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:id="@+id/textOutput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/buttonSave"
+            android:background="#00000000"
+            android:ems="10"
+            android:gravity="start"
+            android:minHeight="120dp"
+            android:hint="Перевод"
+            android:scrollbars="vertical"
+            android:textColor="@color/colorText"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/buttonSave"
+            android:layout_width="40dp"
+            android:layout_height="70dp"
+            android:layout_alignParentEnd="true"
+            android:background="#00000000" />
+
+        <ImageView
+            android:id="@+id/imageFloppy"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignEnd="@+id/buttonSave"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_floppy" />
+
+    </RelativeLayout>
+
+</LinearLayout>
