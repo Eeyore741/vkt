@@ -38,8 +38,8 @@ public class RootActivity extends AppCompatActivity {
         showTranslateFragment();
         TranslationManager.sharedManager.subscribe(this);
 
-        Locale locale = getCurrentLocale();
-        Log.d(RootActivity.class.getName(), locale.toString());
+//        Locale locale = getCurrentLocale();
+//        Log.d(RootActivity.class.getName(), locale.toString());
     }
 
     @Subscribe
@@ -97,15 +97,15 @@ public class RootActivity extends AppCompatActivity {
                 .setTransition(FragmentTransaction.TRANSIT_NONE)
                 .commit();
     }
-
-    public Locale getCurrentLocale(){
-        if (mLocale == null){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                mLocale = getResources().getConfiguration().getLocales().get(0);
-            } else{
-                mLocale = getResources().getConfiguration().locale;
-            }
-        }
-        return mLocale;
-    }
+//
+//    public Locale getCurrentLocale(){
+//        if (mLocale == null){
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+//                mLocale = getResources().getConfiguration().getLocales().get(0);
+//            } else{
+//                mLocale = getResources().getConfiguration().locale;
+//            }
+//        }
+//        return mLocale;
+//    }
 }

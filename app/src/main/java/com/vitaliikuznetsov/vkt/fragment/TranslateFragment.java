@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +27,7 @@ import com.vitaliikuznetsov.vkt.activity.RootActivity;
 import com.vitaliikuznetsov.vkt.adapter.LangsAdapter;
 import com.vitaliikuznetsov.vkt.model.Event;
 import com.vitaliikuznetsov.vkt.model.Lang;
+import com.vitaliikuznetsov.vkt.model.Translation;
 import com.vitaliikuznetsov.vkt.model.TranslationManager;
 
 import java.util.List;
@@ -57,6 +59,8 @@ public class TranslateFragment extends Fragment {
     ImageView imageTrash;
     @BindView(R.id.imageFloppy)
     ImageView imageFloppy;
+    @BindView(R.id.progressBar)
+    ProgressBar progressBar;
 
     private Lang sourceLang;
     private Lang targetLang;
@@ -95,6 +99,11 @@ public class TranslateFragment extends Fragment {
                 TranslateFragment.this.setTargetLang(sourceLang);
                 TranslationManager.sharedManager.setPreferredSourceLang(TranslateFragment.this.sourceLang);
                 TranslationManager.sharedManager.setPreferredTargetLang(TranslateFragment.this.targetLang);
+                if (countDownTimer != null) countDownTimer.cancel();
+                inputEdit.setText(outputText.getText());
+                outputText.setText(null);
+                TranslateFragment.this.progressBar.setVisibility(View.VISIBLE);
+                TranslationManager.sharedManager.getTranslation(inputEdit.getText().toString(), TranslateFragment.this.sourceLang, TranslateFragment.this.targetLang);
             }
         });
         inputEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -113,8 +122,19 @@ public class TranslateFragment extends Fragment {
                 return false;
             }
         });
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (countDownTimer != null) countDownTimer.cancel();
+                inputEdit.setText(null);
+                outputText.setText(null);
+                setSavingEnabled(false);
+                setCleaningEnabled(false);
+            }
+        });
         setSavingEnabled(false);
         setCleaningEnabled(false);
+        progressBar.setVisibility(View.INVISIBLE);
         return view;
     }
 
@@ -145,7 +165,8 @@ public class TranslateFragment extends Fragment {
 
             @Override
             public void onFinish() {
-
+                TranslateFragment.this.progressBar.setVisibility(View.VISIBLE);
+                TranslationManager.sharedManager.getTranslation(inputEdit.getText().toString(), sourceLang, targetLang);
             }
         };
         countDownTimer.start();
@@ -206,6 +227,17 @@ public class TranslateFragment extends Fragment {
                 if (sourceLang != null) setSourceLang(sourceLang);
                 Lang targetLang = TranslationManager.sharedManager.getPreferredTargetLang();
                 if (targetLang != null) setTargetLang(targetLang);
+            }
+        }
+        if (event.getNotification() == TranslationManager.NOTIFICATION_TRANSLATE){
+            progressBar.setVisibility(View.INVISIBLE);
+            if (event.isSuccess()){
+                Translation translation = (Translation) event.getObject();
+                outputText.setText(translation.getTranslation());
+                Log.d(getClass().getName(), "got translation " + translation.toString());
+            }
+            else {
+                Log.d(getClass().getName(), "translation error");
             }
         }
     }

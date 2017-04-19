@@ -21,6 +21,8 @@ import java.io.Serializable;
 public class Lang implements Serializable{
 
     @Id
+    private Long id;
+    @Unique
     private String code;
     @NotNull
     private String title;
@@ -29,19 +31,33 @@ public class Lang implements Serializable{
     @Transient
     static final long serialVersionUID = 1;
 
-    @Generated(hash = 1340280199)
-    public Lang(String code, @NotNull String title, boolean preferredSource,
-            boolean preferredTarget) {
+    @Generated(hash = 1830652120)
+    public Lang(Long id, String code, @NotNull String title,
+            boolean preferredSource, boolean preferredTarget) {
+        this.id = id;
+        this.code = code;
+        this.title = title;
+        this.preferredSource = preferredSource;
+        this.preferredTarget = preferredTarget;
+    }
+    @Generated(hash = 1197397665)
+    public Lang() {
+    }
+
+    public Lang(String code, @NotNull String title,
+                boolean preferredSource, boolean preferredTarget) {
         this.code = code;
         this.title = title;
         this.preferredSource = preferredSource;
         this.preferredTarget = preferredTarget;
     }
 
-    @Generated(hash = 1197397665)
-    public Lang() {
+    public Long getId() {
+        return this.id;
     }
-
+    public void setId(Long id) {
+        this.id = id;
+    }
     public String getCode() {
         return this.code;
     }
@@ -66,5 +82,4 @@ public class Lang implements Serializable{
     public void setPreferredTarget(boolean preferredTarget) {
         this.preferredTarget = preferredTarget;
     }
-
 }
