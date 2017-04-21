@@ -4,20 +4,20 @@
 
     <item
         app:showAsAction="ifRoom"
-        android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_home_black_24dp"
-        android:title="@string/title_home" />
+        android:id="@+id/navi_translation"
+        android:icon="@drawable/ic_translation"
+        android:title="@string/navi_title_translation" />
 
     <item
         app:showAsAction="ifRoom"
-        android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/title_dashboard" />
+        android:id="@+id/navi_favorites"
+        android:icon="@drawable/ic_favorite"
+        android:title="@string/navi_title_favorite" />
 
     <item
         app:showAsAction="ifRoom"
-        android:id="@+id/navigation_notifications"
-        android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/title_notifications" />
+        android:id="@+id/navi_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/navi_title_settings" />
 
 </menu>

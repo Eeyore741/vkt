@@ -1,33 +1,27 @@
 package com.vitaliikuznetsov.vkt.activity;
 
-import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.SharedPreferencesCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.squareup.otto.Subscribe;
 import com.vitaliikuznetsov.vkt.R;
+import com.vitaliikuznetsov.vkt.fragment.TranslationsTabsFragment;
 import com.vitaliikuznetsov.vkt.fragment.TranslateFragment;
 import com.vitaliikuznetsov.vkt.model.Event;
-import com.vitaliikuznetsov.vkt.model.Lang;
 import com.vitaliikuznetsov.vkt.model.TranslationManager;
-
-import java.util.Locale;
 
 public class RootActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
-    private TranslateFragment mTranslateFragment;
-    private Locale mLocale;
+    private TranslateFragment translateFragment;
+    private TranslationsTabsFragment translationsTabsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +29,8 @@ public class RootActivity extends AppCompatActivity {
         setContentView(R.layout.activity_root);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        showTranslateFragment();
         TranslationManager.sharedManager.subscribe(this);
-
-//        Locale locale = getCurrentLocale();
-//        Log.d(RootActivity.class.getName(), locale.toString());
+        presentTranslateFragment();
     }
 
     @Subscribe
@@ -71,15 +62,17 @@ public class RootActivity extends AppCompatActivity {
 //                Log.d(getClass().getName(), "no source pref");
 //            }
             switch (item.getItemId()) {
-                case R.id.navigation_home:
+                case R.id.navi_translation:
+                    presentTranslateFragment();
 //                    toolbar.setTitle("Home");
 //                    mTextMessage.setText(R.string.title_home);
                     return true;
-                case R.id.navigation_dashboard:
+                case R.id.navi_favorites:
+                    presentTranslationsFragment();
 //                    toolbar.setTitle("Dash");
 //                    mTextMessage.setText(R.string.title_dashboard);
                     return true;
-                case R.id.navigation_notifications:
+                case R.id.navi_settings:
 //                    toolbar.setTitle("Notif");
 //                    mTextMessage.setText(R.string.title_notifications);
                     return true;
@@ -89,23 +82,50 @@ public class RootActivity extends AppCompatActivity {
 
     };
 
-    private void showTranslateFragment(){
-        if (mTranslateFragment == null) mTranslateFragment = new TranslateFragment();
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.content, mTranslateFragment)
-                .addToBackStack(null)
-                .setTransition(FragmentTransaction.TRANSIT_NONE)
-                .commit();
+    private void hideCurrentFragment(){
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content);
+        if (currentFragment != null){
+            getSupportFragmentManager().beginTransaction()
+                    .hide(currentFragment)
+                    .commit();
+        }
     }
-//
-//    public Locale getCurrentLocale(){
-//        if (mLocale == null){
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-//                mLocale = getResources().getConfiguration().getLocales().get(0);
-//            } else{
-//                mLocale = getResources().getConfiguration().locale;
-//            }
-//        }
-//        return mLocale;
-//    }
+
+    private void presentTranslateFragment(){
+        this.hideCurrentFragment();
+        if (translateFragment == null){
+            translateFragment = new TranslateFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.content, translateFragment)
+                    .addToBackStack(null)
+                    .setTransition(FragmentTransaction.TRANSIT_NONE)
+                    .commit();
+        }
+        else {
+            getSupportFragmentManager().beginTransaction()
+                    .show(translateFragment)
+                    .addToBackStack(null)
+                    .setTransition(FragmentTransaction.TRANSIT_NONE)
+                    .commit();
+        }
+    }
+
+    private void presentTranslationsFragment(){
+        this.hideCurrentFragment();
+        if (translationsTabsFragment == null){
+            translationsTabsFragment = new TranslationsTabsFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.content, translationsTabsFragment)
+                    .addToBackStack(null)
+                    .setTransition(FragmentTransaction.TRANSIT_NONE)
+                    .commit();
+        }
+        else {
+            getSupportFragmentManager().beginTransaction()
+                    .show(translationsTabsFragment)
+                    .addToBackStack(null)
+                    .setTransition(FragmentTransaction.TRANSIT_NONE)
+                    .commit();
+        }
+    }
 }

@@ -1,17 +1,13 @@
 package com.vitaliikuznetsov.vkt.fragment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,19 +15,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 import com.vitaliikuznetsov.vkt.R;
-import com.vitaliikuznetsov.vkt.activity.RootActivity;
-import com.vitaliikuznetsov.vkt.adapter.LangsAdapter;
 import com.vitaliikuznetsov.vkt.model.Event;
 import com.vitaliikuznetsov.vkt.model.Lang;
 import com.vitaliikuznetsov.vkt.model.Translation;
 import com.vitaliikuznetsov.vkt.model.TranslationManager;
-
-import java.util.List;
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,6 +55,7 @@ public class TranslateFragment extends Fragment {
     private Lang sourceLang;
     private Lang targetLang;
     private CountDownTimer countDownTimer;
+    private Translation currentTranslation;
 
     public TranslateFragment() {
     }
@@ -100,41 +91,46 @@ public class TranslateFragment extends Fragment {
                 TranslationManager.sharedManager.setPreferredSourceLang(TranslateFragment.this.sourceLang);
                 TranslationManager.sharedManager.setPreferredTargetLang(TranslateFragment.this.targetLang);
                 if (countDownTimer != null) countDownTimer.cancel();
-                inputEdit.setText(outputText.getText());
-                outputText.setText(null);
-                TranslateFragment.this.progressBar.setVisibility(View.VISIBLE);
-                TranslationManager.sharedManager.getTranslation(inputEdit.getText().toString(), TranslateFragment.this.sourceLang, TranslateFragment.this.targetLang);
+                if (outputText.getText().length() > 0){
+                    inputEdit.setText(outputText.getText());
+                    outputText.setText(null);
+                    TranslateFragment.this.beginTranslation();
+                }
             }
         });
         inputEdit.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                setCleaningEnabled(inputEdit.getText().length() > 0);
-                TranslateFragment.this.startTranslateCountdown(keyEvent.getEventTime());
+                if (inputEdit.getText().length() > 0){
+                    TranslateFragment.this.setCleaningEnabled(true);
+                    TranslateFragment.this.startTranslateCountdown();
+                }
+                else {
+                    TranslateFragment.this.cancelTranslation();
+                }
                 return false;
             }
         });
         inputEdit.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                setCleaningEnabled(inputEdit.getText().length() > 0);
-                TranslateFragment.this.startTranslateCountdown(keyEvent.getEventTime());
+                if (inputEdit.getText().length() > 0){
+                    TranslateFragment.this.setCleaningEnabled(true);
+                    TranslateFragment.this.startTranslateCountdown();
+                }
+                else {
+                    TranslateFragment.this.cancelTranslation();
+                }
                 return false;
             }
         });
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (countDownTimer != null) countDownTimer.cancel();
-                inputEdit.setText(null);
-                outputText.setText(null);
-                setSavingEnabled(false);
-                setCleaningEnabled(false);
+                TranslateFragment.this.cancelTranslation();
             }
         });
-        setSavingEnabled(false);
-        setCleaningEnabled(false);
-        progressBar.setVisibility(View.INVISIBLE);
+        TranslateFragment.this.cancelTranslation();
         return view;
     }
 
@@ -155,48 +151,37 @@ public class TranslateFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private void startTranslateCountdown(final long eventTime){
+    private void startTranslateCountdown(){
         if (countDownTimer != null) countDownTimer.cancel();
-        countDownTimer = new CountDownTimer(5000, 1000) {
+        countDownTimer = new CountDownTimer(2000, 2000) {
+
             @Override
             public void onTick(long l) {
-
             }
 
             @Override
             public void onFinish() {
-                TranslateFragment.this.progressBar.setVisibility(View.VISIBLE);
-                TranslationManager.sharedManager.getTranslation(inputEdit.getText().toString(), sourceLang, targetLang);
+                TranslateFragment.this.beginTranslation();
             }
         };
         countDownTimer.start();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
-            case REQUEST_CODE_SOURCE_LANG:
-                if (resultCode == Activity.RESULT_OK){
-                    Lang resultLang = (Lang) data.getSerializableExtra(LangListFragment.ARG_SELECTED_LANG);
-                    if (resultLang.equals(targetLang)){
-                        setTargetLang(sourceLang);
-                    }
-                    setSourceLang(resultLang);
-                    TranslationManager.sharedManager.setPreferredSourceLang(sourceLang);
-                }
-                break;
-            case REQUEST_CODE_TARGET_LANG:
-                if (resultCode == Activity.RESULT_OK){
-                    Lang resultLang = (Lang) data.getSerializableExtra(LangListFragment.ARG_SELECTED_LANG);
-                    if (resultLang.equals(sourceLang)){
-                        setSourceLang(targetLang);
-                    }
-                    setTargetLang(resultLang);
-                    TranslationManager.sharedManager.setPreferredTargetLang(targetLang);
-                }
-                break;
+    private void beginTranslation(){
+        String text = String.valueOf(inputEdit.getText());
+        if (text != null && text.length() > 0){
+            this.progressBar.setVisibility(View.VISIBLE);
+            TranslationManager.sharedManager.getTranslation(text, sourceLang, targetLang);
         }
+    }
+
+    private void cancelTranslation(){
+        this.progressBar.setVisibility(View.INVISIBLE);
+        if (countDownTimer != null) countDownTimer.cancel();
+        inputEdit.setText(null);
+        outputText.setText(null);
+        TranslateFragment.this.setSavingEnabled(false);
+        TranslateFragment.this.setCleaningEnabled(false);
     }
 
     private void setSourceLang(Lang lang){
@@ -219,6 +204,35 @@ public class TranslateFragment extends Fragment {
         imageFloppy.setImageAlpha(enabled ? 255 : 70);
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode){
+            case REQUEST_CODE_SOURCE_LANG:
+                if (resultCode == Activity.RESULT_OK){
+                    this.cancelTranslation();
+                    Lang resultLang = (Lang) data.getSerializableExtra(LangListFragment.ARG_SELECTED_LANG);
+                    if (resultLang.equals(targetLang)){
+                        setTargetLang(sourceLang);
+                    }
+                    setSourceLang(resultLang);
+                    TranslationManager.sharedManager.setPreferredSourceLang(sourceLang);
+                }
+                break;
+            case REQUEST_CODE_TARGET_LANG:
+                if (resultCode == Activity.RESULT_OK){
+                    this.cancelTranslation();
+                    Lang resultLang = (Lang) data.getSerializableExtra(LangListFragment.ARG_SELECTED_LANG);
+                    if (resultLang.equals(sourceLang)){
+                        setSourceLang(targetLang);
+                    }
+                    setTargetLang(resultLang);
+                    TranslationManager.sharedManager.setPreferredTargetLang(targetLang);
+                }
+                break;
+        }
+    }
+
     @Subscribe
     public void onBusEvent(Event event){
         if (event.getNotification() == TranslationManager.NOTIFICATION_GET_LANGUAGES){
@@ -232,12 +246,15 @@ public class TranslateFragment extends Fragment {
         if (event.getNotification() == TranslationManager.NOTIFICATION_TRANSLATE){
             progressBar.setVisibility(View.INVISIBLE);
             if (event.isSuccess()){
-                Translation translation = (Translation) event.getObject();
-                outputText.setText(translation.getTranslation());
-                Log.d(getClass().getName(), "got translation " + translation.toString());
+                currentTranslation = (Translation) event.getObject();
+                String currentText = String.valueOf(inputEdit.getText());
+                if (currentText != null
+                        && currentTranslation.getText().equals(currentText)){
+                    outputText.setText(currentTranslation.getTranslation());
+                    setSavingEnabled(true);
+                }
             }
             else {
-                Log.d(getClass().getName(), "translation error");
             }
         }
     }
