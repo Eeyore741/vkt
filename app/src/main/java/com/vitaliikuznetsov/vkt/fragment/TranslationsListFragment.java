@@ -27,6 +27,7 @@ import com.vitaliikuznetsov.vkt.model.ThisApp;
 import com.vitaliikuznetsov.vkt.model.Translation;
 import com.vitaliikuznetsov.vkt.model.TranslationManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -44,7 +45,7 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
 
     private Mode mode;
     private CountDownTimer countDownTimer;
-    private List<Translation> translations;
+    private ArrayList<Translation> translations;
 
     @BindView(R.id.editSearch)
     EditText searchEdit;
@@ -128,6 +129,10 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
         setProgressHidden(true);
         setClearEnabled(false);
         setEmptyHidden(true);
+        translations = new ArrayList<>();
+        TranslationsAdapter adapter = new TranslationsAdapter(translations, this);
+        this.recyclerView.setAdapter(adapter);
+        this.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         TranslationManager.sharedManager.subscribe(this);
         loadData();
     }
@@ -150,16 +155,11 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                     case TranslationManager.NOTIFICATION_SELECT_TRANSLATIONS:{
                         setProgressHidden(true);
                         if (event.isSuccess()){
-                            translations = (List< Translation>) event.getObject();
-                            if (translations.size() > 0){
-                                TranslationsAdapter adapter = new TranslationsAdapter(translations, this);
-                                this.recyclerView.setAdapter(adapter);
-                                this.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                this.setEmptyHidden(true);
-                            }
-                            else {
-                                this.setEmptyHidden(false);
-                            }
+                            List<Translation> newTranslations = (List<Translation>) event.getObject();
+                            translations.clear();
+                            translations.addAll(newTranslations);
+                            recyclerView.getAdapter().notifyDataSetChanged();
+                            this.setEmptyHidden(translations.size() > 0);
                         }
                         else {
                             Toast.makeText(getActivity(), "Ошибка загрузки", Toast.LENGTH_LONG).show();
@@ -181,6 +181,7 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                             if (this.translations.contains(translation)){
                                 recyclerView.getAdapter().notifyItemRemoved(this.translations.indexOf(translation));
                                 this.translations.remove(translation);
+                                this.setEmptyHidden(translations.size() > 0);
                             }
                         }
                     }
@@ -195,6 +196,20 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                         }
                     }
                     break;
+
+                    case TranslationManager.NOTIFICATION_DELETE_HISTORY:{
+                        if (event.isSuccess()){
+                            TranslationManager.sharedManager.selectTranslationsWithString(searchEdit.getText().toString());
+                        }
+                    }
+                    break;
+
+                    case TranslationManager.NOTIFICATION_DELETE_FAVORITES:{
+                        if (event.isSuccess()){
+                            TranslationManager.sharedManager.selectTranslationsWithString(searchEdit.getText().toString());
+                        }
+                    }
+                    break;
                 }
             }
             break;
@@ -206,16 +221,11 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                     case TranslationManager.NOTIFICATION_SELECT_FAVORITE_TRANSLATIONS:{
                         setProgressHidden(true);
                         if (event.isSuccess()){
-                            translations = (List< Translation>) event.getObject();
-                            if (translations.size() > 0){
-                                TranslationsAdapter adapter = new TranslationsAdapter(translations, this);
-                                this.recyclerView.setAdapter(adapter);
-                                this.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                                this.setEmptyHidden(true);
-                            }
-                            else {
-                                this.setEmptyHidden(false);
-                            }
+                            List<Translation> newTranslations = (List<Translation>) event.getObject();
+                            translations.clear();
+                            translations.addAll(newTranslations);
+                            recyclerView.getAdapter().notifyDataSetChanged();
+                            this.setEmptyHidden(translations.size() > 0);
                         }
                         else {
                             Toast.makeText(getActivity(), "Ошибка загрузки", Toast.LENGTH_LONG).show();
@@ -238,6 +248,7 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                                 recyclerView.getAdapter().notifyItemInserted(0);
                                 recyclerView.scrollToPosition(0);
                             }
+                            this.setEmptyHidden(translations.size() > 0);
                         }
                     }
                     break;
@@ -248,7 +259,15 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                             if (this.translations.contains(translation)){
                                 recyclerView.getAdapter().notifyItemRemoved(this.translations.indexOf(translation));
                                 this.translations.remove(translation);
+                                this.setEmptyHidden(translations.size() > 0);
                             }
+                        }
+                    }
+                    break;
+
+                    case TranslationManager.NOTIFICATION_DELETE_FAVORITES:{
+                        if (event.isSuccess()){
+                            TranslationManager.sharedManager.selectFavoriteTranslationsWithString(searchEdit.getText().toString());
                         }
                     }
                     break;
@@ -259,12 +278,14 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
 
     @Override
     public void onTranslationClick(Translation translation) {
-
+//        TranslationDetailDialog translationDetailDialog = TranslationDetailDialog.newInstance(translation);
+//        translationDetailDialog.show(getFragmentManager(), null);
     }
 
     @Override
     public void onTranslationLongClick(Translation translation) {
-        DeleteEntryDialog deleteEntryDialog = DeleteEntryDialog.newInstance(translation);
+        String title = ThisApp.sharedApp().getResources().getString(R.string.alert_dialog_title_delete_one);
+        DeleteEntryDialog deleteEntryDialog = DeleteEntryDialog.newInstance(title, translation);
         deleteEntryDialog.setTargetFragment(this, REQUEST_CODE_DELETE_ENTRY);
         deleteEntryDialog.show(getFragmentManager(), null);
     }
@@ -278,8 +299,8 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_DELETE_ENTRY){
             if (resultCode == Activity.RESULT_OK){
-                if (data.hasExtra(DeleteEntryDialog.ARG_ENTRY)){
-                    Translation translation = (Translation) data.getSerializableExtra(DeleteEntryDialog.ARG_ENTRY);
+                if (data.hasExtra(DeleteEntryDialog.ARG_OBJECT)){
+                    Translation translation = (Translation) data.getSerializableExtra(DeleteEntryDialog.ARG_OBJECT);
                     TranslationManager.sharedManager.deleteTranslation(translation);
                 }
             }

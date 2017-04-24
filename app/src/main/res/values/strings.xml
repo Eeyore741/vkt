@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Vkt</string>
+    <string name="app_name">Translate</string>
     <string name="navi_title_translation">Translation</string>
     <string name="navi_title_favorite">Favorite</string>
     <string name="navi_title_settings">Settings</string>
@@ -10,7 +10,8 @@
     <string name="empty_list_hint">List is empty</string>
     <string name="alert_dialog_ok">Ok</string>
     <string name="alert_dialog_cancel">Cancel</string>
-    <string name="alert_dialog_title">Delete entry?</string>
+    <string name="alert_dialog_title_delete_one">Delete entry?</string>
+    <string name="alert_dialog_title_delete_all">Delete all entries?</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

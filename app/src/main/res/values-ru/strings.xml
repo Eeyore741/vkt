@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Вкт</string>
+    <string name="app_name">Translate</string>
     <string name="navi_title_favorite">Избранное</string>
     <string name="navi_title_settings">Настройки</string>
     <string name="navi_title_translation">Перевод</string>
@@ -12,5 +12,6 @@
     <string name="hello_blank_fragment">asdasd</string>
     <string name="alert_dialog_ok">Да</string>
     <string name="alert_dialog_cancel">Отмена</string>
-    <string name="alert_dialog_title">Удалить запись?</string>
+    <string name="alert_dialog_title_delete_all">Удалить все записи?</string>
+    <string name="alert_dialog_title_delete_one">Удалить запись?</string>
 </resources>

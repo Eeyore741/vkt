@@ -4,28 +4,29 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
-import android.widget.TextView;
 
-import com.squareup.otto.Subscribe;
 import com.vitaliikuznetsov.vkt.R;
+import com.vitaliikuznetsov.vkt.fragment.SettingsFragment;
 import com.vitaliikuznetsov.vkt.fragment.TranslationsTabsFragment;
 import com.vitaliikuznetsov.vkt.fragment.TranslateFragment;
-import com.vitaliikuznetsov.vkt.model.Event;
-import com.vitaliikuznetsov.vkt.model.TranslationManager;
+
+import java.util.ArrayList;
 
 public class RootActivity extends AppCompatActivity {
 
     private TranslateFragment translateFragment;
     private TranslationsTabsFragment translationsTabsFragment;
+    private SettingsFragment settingsFragment;
+
+    ArrayList<Fragment> fragments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_root);
+        fragments = new ArrayList<>();
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         presentTranslateFragment();
@@ -44,7 +45,7 @@ public class RootActivity extends AppCompatActivity {
                     presentTranslationsFragment();
                     return true;
                 case R.id.navi_settings:
-
+                    presentSettingsFragment();
                     return true;
             }
             return false;
@@ -53,10 +54,9 @@ public class RootActivity extends AppCompatActivity {
     };
 
     private void hideCurrentFragment(){
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.content);
-        if (currentFragment != null){
+        for (Fragment fragment : fragments){
             getSupportFragmentManager().beginTransaction()
-                    .hide(currentFragment)
+                    .hide(fragment)
                     .commit();
         }
     }
@@ -65,17 +65,14 @@ public class RootActivity extends AppCompatActivity {
         this.hideCurrentFragment();
         if (translateFragment == null){
             translateFragment = new TranslateFragment();
+            this.fragments.add(translateFragment);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.content, translateFragment)
-                    .addToBackStack(null)
-                    .setTransition(FragmentTransaction.TRANSIT_NONE)
                     .commit();
         }
         else {
             getSupportFragmentManager().beginTransaction()
                     .show(translateFragment)
-                    .addToBackStack(null)
-                    .setTransition(FragmentTransaction.TRANSIT_NONE)
                     .commit();
         }
     }
@@ -84,17 +81,30 @@ public class RootActivity extends AppCompatActivity {
         this.hideCurrentFragment();
         if (translationsTabsFragment == null){
             translationsTabsFragment = new TranslationsTabsFragment();
+            this.fragments.add(translationsTabsFragment);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.content, translationsTabsFragment)
-                    .addToBackStack(null)
-                    .setTransition(FragmentTransaction.TRANSIT_NONE)
                     .commit();
         }
         else {
             getSupportFragmentManager().beginTransaction()
                     .show(translationsTabsFragment)
-                    .addToBackStack(null)
-                    .setTransition(FragmentTransaction.TRANSIT_NONE)
+                    .commit();
+        }
+    }
+
+    private void presentSettingsFragment(){
+        this.hideCurrentFragment();
+        if (settingsFragment == null){
+            settingsFragment = new SettingsFragment();
+            this.fragments.add(settingsFragment);
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.content, settingsFragment)
+                    .commit();
+        }
+        else {
+            getSupportFragmentManager().beginTransaction()
+                    .show(settingsFragment)
                     .commit();
         }
     }

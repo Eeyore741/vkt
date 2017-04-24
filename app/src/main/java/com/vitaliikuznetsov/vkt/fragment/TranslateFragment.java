@@ -240,6 +240,24 @@ public class TranslateFragment extends Fragment {
                 }
             }
             break;
+
+            case TranslationManager.NOTIFICATION_DELETE_HISTORY:{
+                if (event.isSuccess()){
+                    if (currentTranslation != null){
+                        setSavingEnabled(true);
+                    }
+                }
+            }
+            break;
+
+            case TranslationManager.NOTIFICATION_DELETE_FAVORITES:{
+                if (event.isSuccess()){
+                    if (currentTranslation != null){
+                        setSavingEnabled(true);
+                    }
+                }
+            }
+            break;
         }
     }
 
