@@ -1,5 +1,7 @@
 package com.vitaliikuznetsov.vkt.model;
 
+import android.net.sip.SipAudioCall;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -48,6 +50,10 @@ public class TranslationManager {
 
     public static final int NOTIFICATION_GET_LANGUAGES = 1;
     public static final int NOTIFICATION_TRANSLATE = 2;
+    public static final int NOTIFICATION_SELECT_TRANSLATIONS = 3;
+    public static final int NOTIFICATION_DELETE_TRANSLATION = 4;
+    public static final int NOTIFICATION_UPDATE_TRANSLATION = 5;
+    public static final int NOTIFICATION_SELECT_FAVORITE_TRANSLATIONS = 6;
 
     private static final int DEFAULT_CACHE_SIZE = 1024 * 1024 * 10; // байты
     private static final int DEFAULT_CACHE_LIVE = 10; // дни
@@ -82,6 +88,8 @@ public class TranslationManager {
             .registerTypeAdapter(Lang.class, new ytLangDeserializer())
             .create();
     private Handler mHandler = new Handler(Looper.getMainLooper());
+    private AsyncTask<Void, Void, Void> selectTranslationsTask;
+    private AsyncTask<Void, Void, Void> selectFavoriteTranslationsTask;
 
     private TranslationManager() {
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(ThisApp.sharedApp(), "vkt-db");
@@ -108,22 +116,11 @@ public class TranslationManager {
         mBus.unregister(object);
     }
 
-    private ArrayList<Object> modelsOfClass(JsonElement jsonElement, Class modelClass){
-        JsonArray jsonArray = jsonElement.getAsJsonArray();
-        ArrayList<Object> modelsArray = new ArrayList<Object>();
-        for (JsonElement element : jsonArray){
-            Object model = mGson.fromJson(element, modelClass);
-            modelsArray.add(model);
-        }
-        return modelsArray;
-    }
-
     public void getSupportedLanguages(){
         Query<Lang> langsQuery = langDao.queryBuilder().orderAsc(LangDao.Properties.Code).build();
         List<Lang> langs = langsQuery.list();
-        if (langs.size() != 0){
+        if (langs.size() != 0)
             TranslationManager.this.postBusEvent(Event.successEvent(NOTIFICATION_GET_LANGUAGES, langs));
-        }
         else {
             HttpUrl httpUrl = HttpUrl.parse(API_URL_YT_BASE)
                     .newBuilder()
@@ -163,7 +160,7 @@ public class TranslationManager {
                         }
                         TranslationManager.this.postBusEvent(Event.successEvent(NOTIFICATION_GET_LANGUAGES, out));
                     } catch (JSONException e) {
-                        e.printStackTrace();
+                        TranslationManager.sharedManager.postBusEvent(Event.failEvent(NOTIFICATION_GET_LANGUAGES, e.getMessage()));
                     }
                 }
             });
@@ -174,11 +171,9 @@ public class TranslationManager {
         int hash = Translation.hash(sourceLang.getCode(), targetLang.getCode(), text);
         Translation translation = translationDao.queryBuilder().where(TranslationDao.Properties.Hash.eq(hash)).unique();
         if (translation != null){
-            Log.d(TranslationManager.class.getName(), "getTranslation local");
             TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_TRANSLATE, translation));
         }
         else {
-            Log.d(TranslationManager.class.getName(), "getTranslation remote");
             HttpUrl httpUrl = HttpUrl.parse(API_URL_YT_BASE)
                     .newBuilder()
                     .addEncodedPathSegment(API_URL_YT_TRANSLATE)
@@ -221,7 +216,9 @@ public class TranslationManager {
     }
 
     public void setPreferredSourceLang(Lang lang){
-        Lang sourceLang = langDao.queryBuilder().where(LangDao.Properties.PreferredSource.eq(true)).unique();
+        Lang sourceLang = langDao.queryBuilder()
+                .where(LangDao.Properties.PreferredSource.eq(true))
+                .unique();
         if (sourceLang != null){
             if (sourceLang.equals(lang)) return;
             sourceLang.setPreferredSource(false);
@@ -236,7 +233,9 @@ public class TranslationManager {
     }
 
     public void setPreferredTargetLang(Lang lang){
-        Lang sourceLang = langDao.queryBuilder().where(LangDao.Properties.PreferredTarget.eq(true)).unique();
+        Lang sourceLang = langDao.queryBuilder()
+                .where(LangDao.Properties.PreferredTarget.eq(true))
+                .unique();
         if (sourceLang != null){
             if (sourceLang.equals(lang)) return;
             sourceLang.setPreferredTarget(false);
@@ -248,5 +247,61 @@ public class TranslationManager {
 
     public Lang getPreferredTargetLang(){
         return langDao.queryBuilder().where(LangDao.Properties.PreferredTarget.eq(true)).unique();
+    }
+
+    public void selectTranslationsWithString(String search){
+        final String queryString = "%" + search + "%";
+        if (selectTranslationsTask != null) selectTranslationsTask.cancel(true);
+        selectTranslationsTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                List<Translation> translations = translationDao.queryBuilder()
+                        .whereOr(TranslationDao.Properties.Text.like(queryString), TranslationDao.Properties.Translation.like(queryString))
+                        .orderDesc(TranslationDao.Properties.Id)
+                        .build()
+                        .list();
+                TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_SELECT_TRANSLATIONS, translations));
+                return null;
+            }
+        };
+        selectTranslationsTask.execute();
+    }
+
+    public void selectFavoriteTranslationsWithString(String search){
+        final String queryString = "%" + search + "%";
+        if (selectFavoriteTranslationsTask != null) selectFavoriteTranslationsTask.cancel(true);
+        selectFavoriteTranslationsTask = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                List<Translation> translations = translationDao.queryBuilder()
+                        .where(TranslationDao.Properties.Favorite.eq(true))
+                        .whereOr(TranslationDao.Properties.Text.like(queryString), TranslationDao.Properties.Translation.like(queryString))
+                        .orderDesc(TranslationDao.Properties.Id)
+                        .build()
+                        .list();
+                TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_SELECT_FAVORITE_TRANSLATIONS, translations));
+                return null;
+            }
+        };
+        selectFavoriteTranslationsTask.execute();
+    }
+
+    public void deleteTranslation(final Translation translation){
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                TranslationManager.this.translationDao.delete(translation);
+                TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_DELETE_TRANSLATION, translation));
+                return null;
+            }
+        }
+        .execute();
+    }
+
+    public void updateTranslationFavorite(Translation translation, boolean favorite){
+        translation.setFavorite(favorite);
+        translationDao.save(translation);
+        postBusEvent(Event.successEvent(NOTIFICATION_UPDATE_TRANSLATION, translation));
     }
 }

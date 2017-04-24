@@ -92,6 +92,7 @@
             android:layout_width="40dp"
             android:layout_height="70dp"
             android:layout_alignParentEnd="true"
+            android:layout_marginStart="8dp"
             android:background="#00000000" />
 
         <ImageView
@@ -109,6 +110,7 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:layout_marginEnd="14dp"
         android:layout_marginStart="14dp"
         android:indeterminate="true" />
@@ -144,6 +146,7 @@
             android:layout_width="40dp"
             android:layout_height="70dp"
             android:layout_alignParentEnd="true"
+            android:layout_marginStart="8dp"
             android:background="#00000000" />
 
         <ImageView

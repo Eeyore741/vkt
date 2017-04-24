@@ -1,16 +1,83 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true"
     android:background="#ffffff"
+    android:orientation="vertical"
+    android:animateLayoutChanges="true"
     tools:context="com.vitaliikuznetsov.vkt.fragment.TranslationsListFragment">
 
-    <TextView
-        android:id="@+id/tv"
-        android:text="mode title"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent" />
+    <RelativeLayout
+        android:id="@+id/searchLayout"
+        android:layout_width="match_parent"
+        android:layout_height="54dp">
 
-</FrameLayout>
+        <ImageView
+            android:id="@+id/imageMagni"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="18dp"
+            android:src="@drawable/ic_magni" />
+
+        <EditText
+            android:id="@+id/editSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:layout_toEndOf="@+id/imageMagni"
+            android:layout_toStartOf="@+id/imageCross"
+            android:background="#00000000"
+            android:ems="10"
+            android:gravity="start|center"
+            android:hint="@string/hint_search_history"
+            android:inputType="textCapSentences"
+            android:minHeight="32dp"
+            android:textColor="@color/colorText"
+            android:textSize="20sp" />
+
+        <View
+            android:id="@+id/lineGray"
+            android:layout_width="match_parent"
+            android:layout_height="0.65dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/colorText" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editSearch"
+            android:foregroundGravity="bottom"
+            android:indeterminate="true" />
+
+        <ImageView
+            android:id="@+id/imageCross"
+            android:layout_width="44dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="2dp"
+            android:scaleType="center"
+            android:src="@drawable/ic_cross" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_marginTop="22dp"
+        android:id="@+id/textEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/empty_list_hint"
+        android:textSize="20sp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

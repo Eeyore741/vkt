@@ -5,4 +5,13 @@
     <string name="navi_title_settings">Settings</string>
     <string name="tab_title_history">History</string>
     <string name="tab_title_favorite">Favorite</string>
+    <string name="hint_search_history">Search in History</string>
+    <string name="hint_search_favorite">Search in Favorites</string>
+    <string name="empty_list_hint">List is empty</string>
+    <string name="alert_dialog_ok">Ok</string>
+    <string name="alert_dialog_cancel">Cancel</string>
+    <string name="alert_dialog_title">Delete entry?</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

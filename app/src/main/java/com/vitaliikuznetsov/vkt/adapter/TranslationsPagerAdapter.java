@@ -3,9 +3,6 @@ package com.vitaliikuznetsov.vkt.adapter;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
-import android.support.v4.content.res.ResourcesCompat;
 
 import com.vitaliikuznetsov.vkt.R;
 import com.vitaliikuznetsov.vkt.fragment.TranslationsListFragment;

@@ -32,6 +32,7 @@ public class Translation implements Serializable {
     @NotNull
     private String text;
     private String translation;
+    private boolean favorite;
     @Transient
     static final long serialVersionUID = 1;
 
@@ -48,15 +49,17 @@ public class Translation implements Serializable {
         this.hash = sourceLangCode.hashCode() ^ targetLangCode.hashCode() ^ text.hashCode();
     }
 
-    @Generated(hash = 1169957731)
+    @Generated(hash = 1173735606)
     public Translation(Long id, int hash, @NotNull String sourceLangCode,
-            @NotNull String targetLangCode, @NotNull String text, String translation) {
+            @NotNull String targetLangCode, @NotNull String text, String translation,
+            boolean favorite) {
         this.id = id;
         this.hash = hash;
         this.sourceLangCode = sourceLangCode;
         this.targetLangCode = targetLangCode;
         this.text = text;
         this.translation = translation;
+        this.favorite = favorite;
     }
 
     @Generated(hash = 321689573)
@@ -109,5 +112,13 @@ public class Translation implements Serializable {
 
     public void setTranslation(String translation) {
         this.translation = translation;
+    }
+
+    public boolean getFavorite() {
+        return this.favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 }

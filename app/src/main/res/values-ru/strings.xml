@@ -6,4 +6,11 @@
     <string name="navi_title_translation">Перевод</string>
     <string name="tab_title_favorite">Избранное</string>
     <string name="tab_title_history">История</string>
+    <string name="hint_search_favorite">Искать в Избранном</string>
+    <string name="hint_search_history">Искать в Итории</string>
+    <string name="empty_list_hint">Список пуст</string>
+    <string name="hello_blank_fragment">asdasd</string>
+    <string name="alert_dialog_ok">Да</string>
+    <string name="alert_dialog_cancel">Отмена</string>
+    <string name="alert_dialog_title">Удалить запись?</string>
 </resources>
