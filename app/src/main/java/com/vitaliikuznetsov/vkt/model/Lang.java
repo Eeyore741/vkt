@@ -20,7 +20,7 @@ import java.io.Serializable;
 
 public class Lang implements Serializable{
 
-    @Id
+    @Id(autoincrement = true)
     private Long id;
     @Unique
     private String code;

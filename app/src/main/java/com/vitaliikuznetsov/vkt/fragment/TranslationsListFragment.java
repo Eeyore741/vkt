@@ -64,6 +64,7 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
     }
 
     public static TranslationsListFragment newInstance(Mode mode) {
+
         Bundle args = new Bundle();
         args.putSerializable(ARG_MODE, mode);
         TranslationsListFragment fragment = new TranslationsListFragment();
@@ -74,8 +75,11 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Bundle args = getArguments();
+
         if (args != null && args.containsKey(ARG_MODE)){
+
             this.mode = (Mode) args.getSerializable(ARG_MODE);
         }
     }
@@ -83,49 +87,57 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View view = inflater.inflate(R.layout.fragment_translations_list, container, false);
         ButterKnife.bind(this, view);
         String hint;
+
         switch (this.mode){
+
             case History:
+
                 hint = ThisApp.sharedApp().getResources().getString(R.string.hint_search_history);
                 searchEdit.setHint(hint);
                 break;
+
             case Favorite:
+
                 hint = ThisApp.sharedApp().getResources().getString(R.string.hint_search_favorite);
                 searchEdit.setHint(hint);
                 break;
         }
+
         searchEdit.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void afterTextChanged(Editable editable) {
+
                 TranslationsListFragment.this.setClearEnabled(editable.length() > 0);
                 TranslationsListFragment.this.startDataLoadCountdown();
             }
         });
+
         crossImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 TranslationsListFragment.this.searchEdit.setText("");
                 TranslationsListFragment.this.loadData();
             }
         });
+
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         setProgressHidden(true);
         setClearEnabled(false);
         setEmptyHidden(true);
@@ -139,6 +151,7 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
 
     @Override
     public void onDestroyView() {
+
         TranslationManager.sharedManager.unsubscribe(this);
         super.onDestroyView();
     }
@@ -153,8 +166,11 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                 switch (event.getNotification()){
 
                     case TranslationManager.NOTIFICATION_SELECT_TRANSLATIONS:{
+
                         setProgressHidden(true);
+
                         if (event.isSuccess()){
+
                             List<Translation> newTranslations = (List<Translation>) event.getObject();
                             translations.clear();
                             translations.addAll(newTranslations);
@@ -162,13 +178,16 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                             this.setEmptyHidden(translations.size() > 0);
                         }
                         else {
+
                             Toast.makeText(getActivity(), "Ошибка загрузки", Toast.LENGTH_LONG).show();
                         }
                     }
                     break;
 
                     case TranslationManager.NOTIFICATION_TRANSLATE:{
+
                         if (event.isSuccess()
+
                                 && searchEdit.getText().length() == 0) {
                             this.loadData();
                         }
@@ -176,9 +195,13 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                     break;
 
                     case TranslationManager.NOTIFICATION_DELETE_TRANSLATION:{
+
                         if (event.isSuccess()){
+
                             Translation translation = (Translation) event.getObject();
+
                             if (this.translations.contains(translation)){
+
                                 recyclerView.getAdapter().notifyItemRemoved(this.translations.indexOf(translation));
                                 this.translations.remove(translation);
                                 this.setEmptyHidden(translations.size() > 0);
@@ -188,24 +211,35 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                     break;
 
                     case TranslationManager.NOTIFICATION_UPDATE_TRANSLATION:{
+
                         if (event.isSuccess()){
+
                             Translation translation = (Translation) event.getObject();
                             if (this.translations.contains(translation)){
+
                                 recyclerView.getAdapter().notifyItemChanged(this.translations.indexOf(translation));
+                            }
+                            else {
+
+                                this.loadData();
                             }
                         }
                     }
                     break;
 
                     case TranslationManager.NOTIFICATION_DELETE_HISTORY:{
+
                         if (event.isSuccess()){
+
                             TranslationManager.sharedManager.selectTranslationsWithString(searchEdit.getText().toString());
                         }
                     }
                     break;
 
                     case TranslationManager.NOTIFICATION_DELETE_FAVORITES:{
+
                         if (event.isSuccess()){
+
                             TranslationManager.sharedManager.selectTranslationsWithString(searchEdit.getText().toString());
                         }
                     }
@@ -219,8 +253,10 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                 switch (event.getNotification()){
 
                     case TranslationManager.NOTIFICATION_SELECT_FAVORITE_TRANSLATIONS:{
+
                         setProgressHidden(true);
                         if (event.isSuccess()){
+
                             List<Translation> newTranslations = (List<Translation>) event.getObject();
                             translations.clear();
                             translations.addAll(newTranslations);
@@ -228,22 +264,29 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                             this.setEmptyHidden(translations.size() > 0);
                         }
                         else {
+
                             Toast.makeText(getActivity(), "Ошибка загрузки", Toast.LENGTH_LONG).show();
                         }
                     }
                     break;
 
                     case TranslationManager.NOTIFICATION_UPDATE_TRANSLATION:{
+
                         if (event.isSuccess()){
+
                             Translation translation = (Translation) event.getObject();
+
                             if (this.translations.contains(translation)
                                     && !translation.getFavorite()){
+
                                 recyclerView.getAdapter().notifyItemRemoved(this.translations.indexOf(translation));
                                 this.translations.remove(translation);
                             }
+
                             else
                             if (!this.translations.contains(translation)
                                     && translation.getFavorite()){
+
                                 this.translations.add(0, translation);
                                 recyclerView.getAdapter().notifyItemInserted(0);
                                 recyclerView.scrollToPosition(0);
@@ -254,9 +297,13 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                     break;
 
                     case TranslationManager.NOTIFICATION_DELETE_TRANSLATION:{
+
                         if (event.isSuccess()){
+
                             Translation translation = (Translation) event.getObject();
+
                             if (this.translations.contains(translation)){
+
                                 recyclerView.getAdapter().notifyItemRemoved(this.translations.indexOf(translation));
                                 this.translations.remove(translation);
                                 this.setEmptyHidden(translations.size() > 0);
@@ -266,7 +313,9 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
                     break;
 
                     case TranslationManager.NOTIFICATION_DELETE_FAVORITES:{
+
                         if (event.isSuccess()){
+
                             TranslationManager.sharedManager.selectFavoriteTranslationsWithString(searchEdit.getText().toString());
                         }
                     }
@@ -284,6 +333,7 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
 
     @Override
     public void onTranslationLongClick(Translation translation) {
+
         String title = ThisApp.sharedApp().getResources().getString(R.string.alert_dialog_title_delete_one);
         DeleteEntryDialog deleteEntryDialog = DeleteEntryDialog.newInstance(title, translation);
         deleteEntryDialog.setTargetFragment(this, REQUEST_CODE_DELETE_ENTRY);
@@ -292,14 +342,19 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
 
     @Override
     public void onTranslationFavoriteClick(Translation translation) {
+
         TranslationManager.sharedManager.updateTranslationFavorite(translation, !translation.getFavorite());
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (requestCode == REQUEST_CODE_DELETE_ENTRY){
+
             if (resultCode == Activity.RESULT_OK){
+
                 if (data.hasExtra(DeleteEntryDialog.ARG_OBJECT)){
+
                     Translation translation = (Translation) data.getSerializableExtra(DeleteEntryDialog.ARG_OBJECT);
                     TranslationManager.sharedManager.deleteTranslation(translation);
                 }
@@ -308,26 +363,29 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
     }
 
     private void setProgressHidden(boolean hidden){
+
         progressBar.setVisibility(hidden ? View.INVISIBLE : View.VISIBLE);
         grayLine.setVisibility(hidden ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void setClearEnabled(boolean enabled){
+
         crossImage.setVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
     private void setEmptyHidden(boolean hidden){
+
         emptyText.setVisibility(hidden ? View.GONE : View.VISIBLE);
         recyclerView.setVisibility(hidden ? View.VISIBLE : View.GONE);
     }
 
     private void startDataLoadCountdown(){
+
         if (countDownTimer != null) countDownTimer.cancel();
         countDownTimer = new CountDownTimer(COUNTDOWN_TIMER_DELAY, COUNTDOWN_TIMER_DELAY) {
 
             @Override
-            public void onTick(long l) {
-            }
+            public void onTick(long l) {}
 
             @Override
             public void onFinish() {
@@ -338,12 +396,18 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
     }
 
     private void loadData(){
+
         setProgressHidden(false);
+
         switch (this.mode){
+
             case History:
+
                 TranslationManager.sharedManager.selectTranslationsWithString(searchEdit.getText().toString());
                 break;
+
             case Favorite:
+
                 TranslationManager.sharedManager.selectFavoriteTranslationsWithString(searchEdit.getText().toString());
                 break;
         }

@@ -15,13 +15,11 @@ import org.greenrobot.greendao.annotation.Unique;
  * Created by VItalii on 19/04/2017.
  */
 
-@Entity(indexes = {
-        @Index(value = "text, translation, sourceLangCode, targetLangCode ASC", unique = true)
-})
+@Entity()
 
 public class Translation implements Serializable {
 
-    @Id
+    @Id(autoincrement = true)
     private Long id;
     @Unique
     private int hash;

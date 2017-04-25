@@ -178,15 +178,6 @@ public class TranslateFragment extends Fragment {
         setTargetLang(TranslationManager.sharedManager.getPreferredTargetLang());
         TranslationManager.sharedManager.subscribe(this);
         TranslationManager.sharedManager.getSupportedLanguages();
-
-        ///////////////////
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-            Toast.makeText(getActivity(), "You are connecting to Internet!", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(getActivity(), "You are not connecting to Internet!", Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override
