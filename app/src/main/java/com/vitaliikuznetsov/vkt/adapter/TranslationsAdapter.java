@@ -72,7 +72,7 @@ public class TranslationsAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         TranslationViewHolder tViewHolder = (TranslationViewHolder) holder;
         final Translation translation = translations.get(position);
-        String codeTest = translation.getSourceLangCode().toUpperCase() + "–" + translation.getTargetLangCode().toUpperCase();
+        String codeTest = translation.getLangCode().toUpperCase();
         tViewHolder.codeText.setText(codeTest);
         tViewHolder.heartImage.setImageResource(translation.getFavorite() ? R.drawable.ic_heart_blue : R.drawable.ic_heart_gray);
         tViewHolder.sourceText.setText(translation.getText());

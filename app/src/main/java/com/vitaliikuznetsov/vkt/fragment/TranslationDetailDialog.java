@@ -69,7 +69,7 @@ public class TranslationDetailDialog extends DialogFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        String title = translation.getSourceLangCode().toUpperCase() + "-" + translation.getSourceLangCode().toUpperCase();
+        String title = translation.getLangCode().toUpperCase();
         getDialog().setTitle(title);
 
         sourceText.setText(translation.getText());

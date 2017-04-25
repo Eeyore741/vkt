@@ -8,6 +8,8 @@ import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import java.sql.SQLOutput;
+
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Unique;
 
@@ -24,9 +26,7 @@ public class Translation implements Serializable {
     @Unique
     private int hash;
     @NotNull
-    private String sourceLangCode;
-    @NotNull
-    private String targetLangCode;
+    private String langCode;
     @NotNull
     private String text;
     private String translation;
@@ -35,33 +35,22 @@ public class Translation implements Serializable {
     static final long serialVersionUID = 1;
 
     @Keep
-    public static int hash(String sourceLangCode, String targetLangCode, String text){
-        return sourceLangCode.hashCode() ^ targetLangCode.hashCode() ^ text.hashCode();
+    public Translation(String langCode, String text) {
+        this.langCode = langCode;
+        this.text = text;
+        this.hash = langCode.hashCode() ^ text.hashCode();
     }
 
     @Keep
-    public Translation(String sourceLangCode, String targetLangCode, String text) {
-        this.sourceLangCode = sourceLangCode;
-        this.targetLangCode = targetLangCode;
-        this.text = text;
-        this.hash = sourceLangCode.hashCode() ^ targetLangCode.hashCode() ^ text.hashCode();
-    }
+    public static int hash(String sourceLangCode, String targetLangCode, String text){
 
-    @Generated(hash = 1173735606)
-    public Translation(Long id, int hash, @NotNull String sourceLangCode,
-            @NotNull String targetLangCode, @NotNull String text, String translation,
-            boolean favorite) {
-        this.id = id;
-        this.hash = hash;
-        this.sourceLangCode = sourceLangCode;
-        this.targetLangCode = targetLangCode;
-        this.text = text;
-        this.translation = translation;
-        this.favorite = favorite;
-    }
+        if (sourceLangCode != null
+                && targetLangCode != null
+                && text != null){
 
-    @Generated(hash = 321689573)
-    public Translation() {
+            return (sourceLangCode + "-" + targetLangCode).hashCode() ^ text.hashCode();
+        }
+        return 0;
     }
 
     public Long getId() {
@@ -80,20 +69,12 @@ public class Translation implements Serializable {
         this.hash = hash;
     }
 
-    public String getSourceLangCode() {
-        return this.sourceLangCode;
+    public String getLangCode() {
+        return this.langCode;
     }
 
-    public void setSourceLangCode(String sourceLangCode) {
-        this.sourceLangCode = sourceLangCode;
-    }
-
-    public String getTargetLangCode() {
-        return this.targetLangCode;
-    }
-
-    public void setTargetLangCode(String targetLangCode) {
-        this.targetLangCode = targetLangCode;
+    public void setLangCode(String langCode) {
+        this.langCode = langCode;
     }
 
     public String getText() {
@@ -118,5 +99,20 @@ public class Translation implements Serializable {
 
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
+    }
+
+    @Generated(hash = 1919046464)
+    public Translation(Long id, int hash, @NotNull String langCode, @NotNull String text,
+            String translation, boolean favorite) {
+        this.id = id;
+        this.hash = hash;
+        this.langCode = langCode;
+        this.text = text;
+        this.translation = translation;
+        this.favorite = favorite;
+    }
+
+    @Generated(hash = 321689573)
+    public Translation() {
     }
 }
