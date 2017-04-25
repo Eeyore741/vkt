@@ -1,6 +1,8 @@
-package com.vitaliikuznetsov.vkt.model;
+package com.vitaliikuznetsov.vkt;
 
 import android.app.Application;
+
+import com.vitaliikuznetsov.vkt.model.DaoSession;
 
 /**
  * Created by vitalykuznetsov on 13/04/17.

@@ -1,5 +1,6 @@
 package com.vitaliikuznetsov.vkt.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -20,11 +21,15 @@ public class RootActivity extends AppCompatActivity {
     private TranslationsTabsFragment translationsTabsFragment;
     private SettingsFragment settingsFragment;
 
+    public static RootActivity sharedActivity;
+
     ArrayList<Fragment> fragments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sharedActivity = this;
         setContentView(R.layout.activity_root);
         fragments = new ArrayList<>();
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -37,14 +42,21 @@ public class RootActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
             switch (item.getItemId()) {
+
                 case R.id.navi_translation:
+
                     presentTranslateFragment();
                     return true;
+
                 case R.id.navi_favorites:
+
                     presentTranslationsFragment();
                     return true;
+
                 case R.id.navi_settings:
+
                     presentSettingsFragment();
                     return true;
             }
@@ -54,7 +66,9 @@ public class RootActivity extends AppCompatActivity {
     };
 
     private void hideCurrentFragment(){
+
         for (Fragment fragment : fragments){
+
             getSupportFragmentManager().beginTransaction()
                     .hide(fragment)
                     .commit();
@@ -62,8 +76,11 @@ public class RootActivity extends AppCompatActivity {
     }
 
     private void presentTranslateFragment(){
+
         this.hideCurrentFragment();
+
         if (translateFragment == null){
+
             translateFragment = new TranslateFragment();
             this.fragments.add(translateFragment);
             getSupportFragmentManager().beginTransaction()
@@ -71,6 +88,7 @@ public class RootActivity extends AppCompatActivity {
                     .commit();
         }
         else {
+
             getSupportFragmentManager().beginTransaction()
                     .show(translateFragment)
                     .commit();
@@ -78,8 +96,11 @@ public class RootActivity extends AppCompatActivity {
     }
 
     private void presentTranslationsFragment(){
+
         this.hideCurrentFragment();
+
         if (translationsTabsFragment == null){
+
             translationsTabsFragment = new TranslationsTabsFragment();
             this.fragments.add(translationsTabsFragment);
             getSupportFragmentManager().beginTransaction()
@@ -87,6 +108,7 @@ public class RootActivity extends AppCompatActivity {
                     .commit();
         }
         else {
+
             getSupportFragmentManager().beginTransaction()
                     .show(translationsTabsFragment)
                     .commit();
@@ -94,8 +116,11 @@ public class RootActivity extends AppCompatActivity {
     }
 
     private void presentSettingsFragment(){
+
         this.hideCurrentFragment();
+
         if (settingsFragment == null){
+
             settingsFragment = new SettingsFragment();
             this.fragments.add(settingsFragment);
             getSupportFragmentManager().beginTransaction()
@@ -103,6 +128,7 @@ public class RootActivity extends AppCompatActivity {
                     .commit();
         }
         else {
+
             getSupportFragmentManager().beginTransaction()
                     .show(settingsFragment)
                     .commit();

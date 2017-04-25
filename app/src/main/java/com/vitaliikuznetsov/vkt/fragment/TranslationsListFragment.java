@@ -23,7 +23,7 @@ import com.squareup.otto.Subscribe;
 import com.vitaliikuznetsov.vkt.R;
 import com.vitaliikuznetsov.vkt.adapter.TranslationsAdapter;
 import com.vitaliikuznetsov.vkt.model.Event;
-import com.vitaliikuznetsov.vkt.model.ThisApp;
+import com.vitaliikuznetsov.vkt.ThisApp;
 import com.vitaliikuznetsov.vkt.model.Translation;
 import com.vitaliikuznetsov.vkt.model.TranslationManager;
 

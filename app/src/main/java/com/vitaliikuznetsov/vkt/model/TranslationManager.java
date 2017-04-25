@@ -1,24 +1,19 @@
 package com.vitaliikuznetsov.vkt.model;
 
-import android.net.sip.SipAudioCall;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
+import com.vitaliikuznetsov.vkt.ThisApp;
 
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.database.Database;
-import org.greenrobot.greendao.query.Query;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,20 +22,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.Cache;
-import okhttp3.CacheControl;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okio.BufferedSink;
 
 /**
  * Created by vitalykuznetsov on 13/04/17.
@@ -48,6 +38,7 @@ import okio.BufferedSink;
 
 public class TranslationManager {
 
+    // константы идентификации броадкаст событий
     public static final int NOTIFICATION_GET_LANGUAGES = 1;
     public static final int NOTIFICATION_TRANSLATE = 2;
     public static final int NOTIFICATION_SELECT_TRANSLATIONS = 3;
@@ -87,14 +78,28 @@ public class TranslationManager {
     private AsyncTask<Void, Void, Void> selectTranslationsTask;
     private AsyncTask<Void, Void, Void> selectFavoriteTranslationsTask;
 
+    // инициализация обьектов синхранизации с базой данных
     private TranslationManager() {
+
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(ThisApp.sharedApp(), "vkt-db");
         Database db = helper.getWritableDb();
         DaoSession daoSession = new DaoMaster(db).newSession();
+
         this.langDao = daoSession.getLangDao();
         this.translationDao = daoSession.getTranslationDao();
     }
 
+    // подписать обьект на бродкаст события класса Event
+    public void subscribe(Object object){
+        mBus.register(object);
+    }
+
+    // отменить подписку на бродкаст
+    public void unsubscribe(Object object){
+        mBus.unregister(object);
+    }
+
+    // отправить событие в Main Thread
     private void postBusEvent(final Event event){
 
         mHandler.post(new Runnable() {
@@ -105,45 +110,49 @@ public class TranslationManager {
         });
     }
 
-    public void subscribe(Object object){
-        mBus.register(object);
-    }
-
-    public void unsubscribe(Object object){
-        mBus.unregister(object);
-    }
-
+    // загрузка поддерживаемых язков
     public void getSupportedLanguages(){
 
         final List<Lang> langs = langDao.queryBuilder().orderAsc(LangDao.Properties.Code).build().list();
+
         if (langs.size() != 0)
+
             TranslationManager.this.postBusEvent(Event.successEvent(NOTIFICATION_GET_LANGUAGES, langs));
         else {
+
             HttpUrl httpUrl = HttpUrl.parse(API_URL_YT_BASE)
                     .newBuilder()
                     .addEncodedPathSegment(API_URL_YT_GET_LANGS)
                     .addQueryParameter(API_PARAM_KEY, API_KEY_YANDEX_TRANSLATOR)
                     .addQueryParameter(API_PARAM_UI, DEFAULT_LANG_CODE)
                     .build();
+
             Request request = new Request.Builder()
                     .get()
                     .url(httpUrl)
                     .build();
+
             mHttpClient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
+
                     TranslationManager.sharedManager.postBusEvent(Event.failEvent(NOTIFICATION_GET_LANGUAGES, e.getMessage()));
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
+
                     JsonElement json = new JsonParser().parse(response.body().string());
+
                     try {
+
                         JsonElement element = json.getAsJsonObject().getAsJsonObject(API_KEY_LANGS);
                         JSONObject jso = new JSONObject(element.toString());
                         Iterator<String> iterator = jso.keys();
                         ArrayList<Lang> out = new ArrayList<Lang>();
+
                         while (iterator.hasNext()){
+
                             String langCode = iterator.next();
                             String langTitle = jso.getString(langCode);
                             Lang lang = new Lang(langCode, langTitle, false, false);
@@ -152,8 +161,10 @@ public class TranslationManager {
                             out.add(lang);
                             langDao.insert(lang);
                         }
-                        TranslationManager.this.postBusEvent(Event.successEvent(NOTIFICATION_GET_LANGUAGES, out));
+
+                    TranslationManager.this.postBusEvent(Event.successEvent(NOTIFICATION_GET_LANGUAGES, out));
                     } catch (JSONException e) {
+
                         TranslationManager.sharedManager.postBusEvent(Event.failEvent(NOTIFICATION_GET_LANGUAGES, e.getMessage()));
                     }
                 }
@@ -161,24 +172,30 @@ public class TranslationManager {
         }
     }
 
+    // загрузка перевода строки
     public void getTranslation(final String text, final Lang sourceLang, final Lang targetLang){
 
         int hash = Translation.hash(sourceLang.getCode(), targetLang.getCode(), text);
         Translation translation = translationDao.queryBuilder().where(TranslationDao.Properties.Hash.eq(hash)).unique();
+
         if (translation != null){
+
             TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_TRANSLATE, translation));
         }
         else {
+
             HttpUrl httpUrl = HttpUrl.parse(API_URL_YT_BASE)
                     .newBuilder()
                     .addEncodedPathSegment(API_URL_YT_TRANSLATE)
                     .build();
+
             RequestBody requestBody = new FormBody.Builder()
                     .addEncoded(API_PARAM_KEY, API_KEY_YANDEX_TRANSLATOR)
                     .addEncoded(API_PARAM_FORMAT, API_KEY_FORMAT_PLAIN)
                     .addEncoded(API_PARAM_TEXT, text)
                     .addEncoded(API_PARAM_LANGUAGE, sourceLang.getCode() + "-" + targetLang.getCode())
                     .build();
+
             Request request = new Request.Builder().post(requestBody).url(httpUrl).build();
 
             mHttpClient.newCall(request).enqueue(new Callback() {
@@ -203,9 +220,10 @@ public class TranslationManager {
                                 && jsonObject.get(API_SER_TEXT).isJsonArray()){
 
                             JsonArray jsonArray = jsonObject.getAsJsonArray(API_SER_TEXT);
+
                             if (jsonArray.size() > 0){
 
-                                String translationString = (String) jsonArray.get(0).getAsString();
+                                String translationString = jsonArray.get(0).getAsString();
                                 Translation translation = new Translation(sourceLang.getCode(), targetLang.getCode(), text);
                                 translation.setTranslation(translationString);
                                 TranslationManager.this.translationDao.insert(translation);
@@ -218,11 +236,13 @@ public class TranslationManager {
         }
     }
 
+    // выставить предпочитаеммый язык источника
     public void setPreferredSourceLang(Lang lang){
 
         Lang sourceLang = langDao.queryBuilder()
                 .where(LangDao.Properties.PreferredSource.eq(true))
                 .unique();
+
         if (sourceLang != null){
 
             if (sourceLang.equals(lang)) return;
@@ -233,11 +253,13 @@ public class TranslationManager {
         langDao.save(lang);
     }
 
+    // получить предпочитаеммый язык источника
     public Lang getPreferredSourceLang(){
 
         return langDao.queryBuilder().where(LangDao.Properties.PreferredSource.eq(true)).unique();
     }
 
+    // выставить предпочитаемый язык направления перевода
     public void setPreferredTargetLang(Lang lang){
 
         Lang sourceLang = langDao.queryBuilder()
@@ -254,11 +276,13 @@ public class TranslationManager {
         langDao.save(lang);
     }
 
+    // получить предпочитаемый язык направления перевода
     public Lang getPreferredTargetLang(){
 
         return langDao.queryBuilder().where(LangDao.Properties.PreferredTarget.eq(true)).unique();
     }
 
+    // поиск обьектов перевода по содержанию строки в тесте перевода или источнике в бекграунд таске
     public void selectTranslationsWithString(String search){
 
         final String queryString = "%" + search + "%";
@@ -280,6 +304,7 @@ public class TranslationManager {
         selectTranslationsTask.execute();
     }
 
+    // поиск обьектов перевода по содержанию строки в тесте перевода или источнике в бекграунд таске с меткой избранного
     public void selectFavoriteTranslationsWithString(String search){
 
         final String queryString = "%" + search + "%";
@@ -295,6 +320,7 @@ public class TranslationManager {
                         .orderDesc(TranslationDao.Properties.Id)
                         .build()
                         .list();
+
                 TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_SELECT_FAVORITE_TRANSLATIONS, translations));
                 return null;
             }
@@ -302,6 +328,7 @@ public class TranslationManager {
         selectFavoriteTranslationsTask.execute();
     }
 
+    // удалить обьект перевода
     public void deleteTranslation(final Translation translation){
 
         new AsyncTask<Void, Void, Void>() {
@@ -316,6 +343,7 @@ public class TranslationManager {
         .execute();
     }
 
+    // обновить поле избранного в обьекте перевода
     public void updateTranslationFavorite(Translation translation, boolean favorite){
 
         translation.setFavorite(favorite);
@@ -323,7 +351,9 @@ public class TranslationManager {
         postBusEvent(Event.successEvent(NOTIFICATION_UPDATE_TRANSLATION, translation));
     }
 
+    // удалить обьекты перевода кроме избранных
     public void deleteAllHistory(){
+
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -332,6 +362,7 @@ public class TranslationManager {
                         .where(TranslationDao.Properties.Favorite.eq(false))
                         .buildDelete()
                         .executeDeleteWithoutDetachingEntities();
+
                 TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_DELETE_HISTORY, null));
                 return null;
             }
@@ -339,6 +370,7 @@ public class TranslationManager {
         .execute();
     }
 
+    // удалить избранные обьекты перевода
     public void deleteAllFavorites(){
 
         new AsyncTask<Void, Void, Void>() {
@@ -349,6 +381,7 @@ public class TranslationManager {
                         .where(TranslationDao.Properties.Favorite.eq(true))
                         .buildDelete()
                         .executeDeleteWithoutDetachingEntities();
+
                 TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_DELETE_FAVORITES, null));
                 return null;
             }

@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.vitaliikuznetsov.vkt.R;
 import com.vitaliikuznetsov.vkt.fragment.TranslationsListFragment;
-import com.vitaliikuznetsov.vkt.model.ThisApp;
+import com.vitaliikuznetsov.vkt.ThisApp;
 
 /**
  * Created by VItalii on 21/04/2017.
