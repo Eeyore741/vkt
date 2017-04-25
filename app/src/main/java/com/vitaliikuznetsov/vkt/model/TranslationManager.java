@@ -53,9 +53,11 @@ public class TranslationManager {
     private static final String API_KEY_YANDEX_TRANSLATOR = "trnsl.1.1.20170411T144731Z.570e044eb78da1d7.78312d6d0d3b918f0444c21a4b00dd42d1b8e23d";
     private static final String API_KEY_FORMAT_PLAIN = "plain";
     private static final String API_KEY_LANGS = "langs";
-    private static final String API_KEY_LANG_CODE = "lang";
+    private static final String API_KEY_RESULT_SUCCESS = "200";
 
+    private static final String API_SER_RESULT = "code";
     private static final String API_SER_TEXT = "text";
+    private static final String API_SER_LANG_CODE = "lang";
 
     private static final String API_PARAM_KEY = "key";
     private static final String API_PARAM_UI = "ui";
@@ -217,10 +219,10 @@ public class TranslationManager {
 
                         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-                        if (jsonObject.has(API_SER_TEXT)
-                                && jsonObject.get(API_SER_TEXT).isJsonArray()){
+                        if (jsonObject.has(API_SER_RESULT)
+                                && jsonObject.getAsJsonPrimitive(API_SER_RESULT).getAsString().equals(API_KEY_RESULT_SUCCESS)){
 
-                            String langCodeString = jsonObject.getAsJsonPrimitive(API_KEY_LANG_CODE).getAsString();
+                            String langCodeString = jsonObject.getAsJsonPrimitive(API_SER_LANG_CODE).getAsString();
                             JsonArray translationsArray = jsonObject.getAsJsonArray(API_SER_TEXT);
 
                             if (translationsArray.size() > 0){
@@ -230,9 +232,11 @@ public class TranslationManager {
                                 translation.setTranslation(translationString);
                                 TranslationManager.this.translationDao.insertOrReplace(translation);
                                 TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_TRANSLATE, translation));
+                                return;
                             }
                         }
                     }
+                    TranslationManager.sharedManager.postBusEvent(Event.failEvent(NOTIFICATION_TRANSLATE, null));
                 }
             });
         }
