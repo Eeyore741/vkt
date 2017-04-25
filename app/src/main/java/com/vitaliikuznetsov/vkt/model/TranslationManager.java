@@ -194,7 +194,7 @@ public class TranslationManager {
                     .addEncoded(API_PARAM_KEY, API_KEY_YANDEX_TRANSLATOR)
                     .addEncoded(API_PARAM_FORMAT, API_KEY_FORMAT_PLAIN)
                     .addEncoded(API_PARAM_TEXT, text)
-                    .addEncoded(API_PARAM_LANGUAGE, sourceLang.getCode() + "-" + targetLang.getCode())
+                    .addEncoded(API_PARAM_LANGUAGE, targetLang.getCode())
                     .build();
 
             Request request = new Request.Builder().post(requestBody).url(httpUrl).build();
@@ -228,7 +228,7 @@ public class TranslationManager {
                                 String translationString = translationsArray.get(0).getAsString();
                                 Translation translation = new Translation(langCodeString, text);
                                 translation.setTranslation(translationString);
-                                TranslationManager.this.translationDao.insert(translation);
+                                TranslationManager.this.translationDao.insertOrReplace(translation);
                                 TranslationManager.sharedManager.postBusEvent(Event.successEvent(NOTIFICATION_TRANSLATE, translation));
                             }
                         }
