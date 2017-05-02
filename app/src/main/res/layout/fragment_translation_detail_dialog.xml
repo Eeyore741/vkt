@@ -3,12 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/naviBack"
+    android:clickable="true"
     tools:context="com.vitaliikuznetsov.vkt.fragment.TranslationDetailDialog">
 
-    <RelativeLayout
+    <ScrollView
         android:id="@+id/layoutInput"
         android:layout_width="match_parent"
-        android:layout_height="130dp"
+        android:layout_height="wrap_content"
+        android:minHeight="60dp"
+        android:maxHeight="60dp"
         android:layout_margin="14dp"
         android:background="@drawable/shape_stroke"
         android:paddingBottom="8dp"
@@ -21,14 +25,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#00000000"
-            android:ems="10"
             android:gravity="start"
-            android:minHeight="100dp"
-            android:scrollbars="vertical"
             android:textColor="@color/colorText"
             android:textSize="20sp" />
 
-    </RelativeLayout>
+    </ScrollView>
 
     <RelativeLayout
         android:id="@+id/layoutOutput"
@@ -37,7 +38,6 @@
         android:layout_marginBottom="14dp"
         android:layout_marginEnd="14dp"
         android:layout_marginStart="14dp"
-
         android:padding="8dp">
 
         <TextView

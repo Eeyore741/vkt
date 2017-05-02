@@ -12,6 +12,7 @@ public class Event {
     private boolean success;
 
     private Event(int notification, Object object, String message, boolean success) {
+
         this.notification = notification;
         this.object = object;
         this.message = message;
@@ -19,10 +20,12 @@ public class Event {
     }
 
     static public Event successEvent(int notification, Object object) {
+
         return new Event(notification, object, null, true);
     }
 
     static public Event failEvent(int notification, String message) {
+
         return new Event(notification, null, message, false);
     }
 

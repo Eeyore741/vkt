@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 import com.vitaliikuznetsov.vkt.R;
+import com.vitaliikuznetsov.vkt.activity.RootActivity;
 import com.vitaliikuznetsov.vkt.adapter.TranslationsAdapter;
 import com.vitaliikuznetsov.vkt.model.Event;
 import com.vitaliikuznetsov.vkt.ThisApp;
@@ -108,6 +109,7 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
         }
 
         searchEdit.addTextChangedListener(new TextWatcher() {
+
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
@@ -327,8 +329,11 @@ public class TranslationsListFragment extends Fragment implements TranslationsAd
 
     @Override
     public void onTranslationClick(Translation translation) {
-//        TranslationDetailDialog translationDetailDialog = TranslationDetailDialog.newInstance(translation);
-//        translationDetailDialog.show(getFragmentManager(), null);
+
+//        RootActivity.sharedActivity.presentTranslateFragment(translation);
+        TranslationDetailDialog translationDetailDialog = TranslationDetailDialog.newInstance(translation);
+        translationDetailDialog.show(getFragmentManager(), null);
+
     }
 
     @Override

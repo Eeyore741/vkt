@@ -28,23 +28,29 @@ public class DeleteEntryDialog extends DialogFragment {
     private String title;
     private Serializable object;
 
-    public DeleteEntryDialog() {
-    }
+    public DeleteEntryDialog() {}
 
     public static DeleteEntryDialog newInstance(String title, Translation translation) {
+
         Bundle args = new Bundle();
+
         if (title != null) args.putString(ARG_TITLE, title);
         if (translation != null) args.putSerializable(ARG_OBJECT, translation);
+
         DeleteEntryDialog fragment = new DeleteEntryDialog();
         fragment.setArguments(args);
+
         return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         Bundle args = getArguments();
+
         if (args != null){
+
             this.title =  args.containsKey(ARG_TITLE) ? args.getString(ARG_TITLE) : "";
             this.object =  args.containsKey(ARG_OBJECT) ? args.getSerializable(ARG_OBJECT) : null;
         }
@@ -53,6 +59,7 @@ public class DeleteEntryDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+
         return new AlertDialog.Builder(getActivity())
                 .setIcon(R.drawable.ic_cross)
                 .setTitle(title)

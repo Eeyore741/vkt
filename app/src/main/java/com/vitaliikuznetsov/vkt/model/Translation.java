@@ -17,7 +17,9 @@ import org.greenrobot.greendao.annotation.Unique;
  * Created by VItalii on 19/04/2017.
  */
 
-@Entity()
+@Entity(indexes = {
+        @Index(value = "hash, langCode, text ASC", unique = true)
+})
 
 public class Translation implements Serializable {
 
@@ -50,6 +52,7 @@ public class Translation implements Serializable {
 
             return (sourceLangCode + "-" + targetLangCode).hashCode() ^ text.hashCode();
         }
+
         return 0;
     }
 

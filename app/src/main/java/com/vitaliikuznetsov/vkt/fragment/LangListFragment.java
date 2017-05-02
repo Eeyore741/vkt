@@ -45,8 +45,10 @@ public class LangListFragment extends DialogFragment {
 
         Bundle args = new Bundle();
         args.putSerializable(ARG_SELECTED_LANG, lang);
+
         LangListFragment fragment = new LangListFragment();
         fragment.setArguments(args);
+
         return fragment;
     }
 

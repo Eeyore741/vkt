@@ -1,6 +1,6 @@
 package com.vitaliikuznetsov.vkt.activity;
 
-import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -32,9 +32,14 @@ public class RootActivity extends AppCompatActivity {
         sharedActivity = this;
         setContentView(R.layout.activity_root);
         fragments = new ArrayList<>();
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        BottomNavigationView  bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         presentTranslateFragment();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -65,7 +70,7 @@ public class RootActivity extends AppCompatActivity {
 
     };
 
-    private void hideCurrentFragment(){
+    private void hideCurrentFragments(){
 
         for (Fragment fragment : fragments){
 
@@ -77,7 +82,7 @@ public class RootActivity extends AppCompatActivity {
 
     private void presentTranslateFragment(){
 
-        this.hideCurrentFragment();
+        this.hideCurrentFragments();
 
         if (translateFragment == null){
 
@@ -97,7 +102,7 @@ public class RootActivity extends AppCompatActivity {
 
     private void presentTranslationsFragment(){
 
-        this.hideCurrentFragment();
+        this.hideCurrentFragments();
 
         if (translationsTabsFragment == null){
 
@@ -117,7 +122,7 @@ public class RootActivity extends AppCompatActivity {
 
     private void presentSettingsFragment(){
 
-        this.hideCurrentFragment();
+        this.hideCurrentFragments();
 
         if (settingsFragment == null){
 

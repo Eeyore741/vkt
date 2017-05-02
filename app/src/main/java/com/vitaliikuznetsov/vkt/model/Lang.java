@@ -15,7 +15,7 @@ import java.io.Serializable;
  */
 
 @Entity(indexes = {
-        @Index(value = "code ASC", unique = true)
+        @Index(value = "title ASC", unique = true)
 })
 
 public class Lang implements Serializable{
@@ -34,6 +34,7 @@ public class Lang implements Serializable{
     @Generated(hash = 1830652120)
     public Lang(Long id, String code, @NotNull String title,
             boolean preferredSource, boolean preferredTarget) {
+
         this.id = id;
         this.code = code;
         this.title = title;
@@ -46,6 +47,7 @@ public class Lang implements Serializable{
 
     public Lang(String code, @NotNull String title,
                 boolean preferredSource, boolean preferredTarget) {
+
         this.code = code;
         this.title = title;
         this.preferredSource = preferredSource;

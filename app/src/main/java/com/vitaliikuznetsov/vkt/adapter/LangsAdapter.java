@@ -31,12 +31,14 @@ public class LangsAdapter extends ArrayAdapter {
     private Drawable greenCheck;
 
     static public class LangViewHolder{
+
         TextView titleLang;
         ImageView checkImage;
     }
 
     public LangsAdapter(@NonNull Activity context, @NonNull List objects, Lang lang) {
         super(context, R.layout.row_lang, objects);
+
         this.selectedLang = lang;
         greenCheck = ContextCompat.getDrawable(getContext(), R.drawable.ic_check_green);
     }
@@ -44,8 +46,11 @@ public class LangsAdapter extends ArrayAdapter {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+
         LangViewHolder langViewHolder = convertView != null ? (LangViewHolder) convertView.getTag() : new LangViewHolder();
+
         if (convertView == null){
+
             Activity activity = (Activity) getContext();
             convertView = activity.getLayoutInflater().inflate(R.layout.row_lang, parent, false);
             langViewHolder.titleLang = (TextView) convertView.findViewById(R.id.textView);
@@ -55,6 +60,7 @@ public class LangsAdapter extends ArrayAdapter {
         Lang lang = (Lang) getItem(position);
         langViewHolder.titleLang.setText(lang.getTitle());
         langViewHolder.checkImage.setImageDrawable( (selectedLang != null && selectedLang.getCode().equals(lang.getCode())) ? greenCheck : null);
+
         return convertView;
     }
 }

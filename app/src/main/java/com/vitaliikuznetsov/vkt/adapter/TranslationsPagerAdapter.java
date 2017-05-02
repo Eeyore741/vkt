@@ -25,19 +25,27 @@ public class TranslationsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
+
         switch (position){
+
             case 0: return TranslationsListFragment.newInstance(TranslationsListFragment.Mode.History);
+
             case 1: return TranslationsListFragment.newInstance(TranslationsListFragment.Mode.Favorite);
         }
+
         return null;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
+
         switch (position){
+
             case 0: return ThisApp.sharedApp().getResources().getString(R.string.tab_title_history);
+
             case 1: return ThisApp.sharedApp().getResources().getString(R.string.tab_title_favorite);
         }
+
         return null;
     }
 }

@@ -3,13 +3,13 @@ apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.vitaliikuznetsov.vkt"
         minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
-        versionName "1.3"
+        versionName "1.5"
     }
     buildTypes {
         release {

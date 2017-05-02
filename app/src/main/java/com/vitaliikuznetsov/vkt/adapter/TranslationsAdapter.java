@@ -25,6 +25,7 @@ import butterknife.ButterKnife;
 public class TranslationsAdapter extends RecyclerView.Adapter {
 
         public interface TranslationsAdapterListener {
+
             void onTranslationClick(Translation translation);
             void onTranslationFavoriteClick(Translation translation);
             void onTranslationLongClick(Translation translation);
@@ -43,8 +44,9 @@ public class TranslationsAdapter extends RecyclerView.Adapter {
             @BindView(R.id.buttonHeart)
             Button heartButton;
 
-            public TranslationViewHolder(View itemView) {
+            private TranslationViewHolder(View itemView) {
                 super(itemView);
+
                 ButterKnife.bind(this, itemView);
             }
         }
@@ -53,6 +55,7 @@ public class TranslationsAdapter extends RecyclerView.Adapter {
     private TranslationsAdapterListener listener;
 
     public TranslationsAdapter(List<Translation> translations, TranslationsAdapterListener listener) {
+
         this.translations = translations;
         this.listener = listener;
     }
@@ -64,15 +67,19 @@ public class TranslationsAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
         View translationView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_translation_item, parent, false);
+
         return new TranslationViewHolder(translationView);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
         TranslationViewHolder tViewHolder = (TranslationViewHolder) holder;
         final Translation translation = translations.get(position);
         String codeTest = translation.getLangCode().toUpperCase();
+
         tViewHolder.codeText.setText(codeTest);
         tViewHolder.heartImage.setImageResource(translation.getFavorite() ? R.drawable.ic_heart_blue : R.drawable.ic_heart_gray);
         tViewHolder.sourceText.setText(translation.getText());
@@ -80,12 +87,14 @@ public class TranslationsAdapter extends RecyclerView.Adapter {
         tViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 TranslationsAdapter.this.listener.onTranslationClick(translation);
             }
         });
         tViewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
+
                 TranslationsAdapter.this.listener.onTranslationLongClick(translation);
                 return true;
             }
@@ -93,6 +102,7 @@ public class TranslationsAdapter extends RecyclerView.Adapter {
         tViewHolder.heartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 TranslationsAdapter.this.listener.onTranslationFavoriteClick(translation);
             }
         });

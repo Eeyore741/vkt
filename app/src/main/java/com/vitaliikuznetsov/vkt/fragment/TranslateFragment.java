@@ -123,6 +123,7 @@ public class TranslateFragment extends Fragment {
         });
 
         inputEdit.addTextChangedListener(new TextWatcher() {
+
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
@@ -251,6 +252,7 @@ public class TranslateFragment extends Fragment {
                         outputText.setText(currentTranslation.getTranslation());
                         setSavingEnabled(!currentTranslation.getFavorite());
                     }
+
                 }
             }
             break;
@@ -312,6 +314,7 @@ public class TranslateFragment extends Fragment {
     private void startTranslateCountdown(){
 
         if (countDownTimer != null) countDownTimer.cancel();
+
         countDownTimer = new CountDownTimer(COUNTDOWN_TIMER_DELAY, COUNTDOWN_TIMER_DELAY) {
 
             @Override
