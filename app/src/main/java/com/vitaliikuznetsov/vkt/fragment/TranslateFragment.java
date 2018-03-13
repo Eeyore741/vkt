@@ -29,6 +29,8 @@ import com.vitaliikuznetsov.vkt.model.Lang;
 import com.vitaliikuznetsov.vkt.model.Translation;
 import com.vitaliikuznetsov.vkt.model.TranslationManager;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -262,6 +264,7 @@ public class TranslateFragment extends Fragment {
                 if (event.isSuccess()){
 
                     Translation translation = (Translation) event.getObject();
+
                     if (currentTranslation != null
                             && translation.equals(currentTranslation)){
 
@@ -323,6 +326,7 @@ public class TranslateFragment extends Fragment {
 
             @Override
             public void onFinish() {
+
                 TranslateFragment.this.beginTranslation();
             }
         };
@@ -354,6 +358,7 @@ public class TranslateFragment extends Fragment {
     private void cancelTranslation(){
 
         this.progressBar.setVisibility(View.INVISIBLE);
+
         if (countDownTimer != null) countDownTimer.cancel();
     }
 

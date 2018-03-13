@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#80d8ff</color>
     <color name="colorPrimaryDark">#80d8ff</color>
-    <color name="colorAccent">#ff80ab</color>
+    <color name="colorAccent">#80d8ff</color>
     <color name="naviBack">#ffffff</color>
     <color name="colorText">#4c4c4c</color>
     <color name="colorTextLight">#7c7c7c</color>
